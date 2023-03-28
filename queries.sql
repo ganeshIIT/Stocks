@@ -1,15 +1,14 @@
 use Stocksdb
 
-select * from stocks
-select * from scrips
+-- select * from stocks
+-- select * from scrips
 
 
 
 declare @maxdate date
 select @maxdate = max(date) from stocks
 -- select @maxdate
-
-select s.name, 
+select @maxdate as date,  s.name, 
 sc.Quantity,
 BuyPrice = sc.Avg_Trading_Price, 
 CurrentPrice = s.[close], 
