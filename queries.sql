@@ -7,7 +7,7 @@ use Stocksdb
 
 declare @maxdate date
 select @maxdate = max(date) from stocks
--- select @maxdate
+select @maxdate
 select @maxdate as date,  s.name, 
 sc.Quantity,
 BuyPrice = sc.Avg_Trading_Price, 
