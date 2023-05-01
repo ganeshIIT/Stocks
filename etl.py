@@ -20,13 +20,13 @@ reader = stock_analysis.StockReader(fromdate, until)
 
 (PIDILITIND, JUBLINGREA, AMBER, METROPOLIS, SUPRAJIT, SONACOMS, FEDERALBNK,
  HDFCBANK, NEWGEN, NATCOPHARM, LTTS, TATASTEEL, MARICO, HCLTECH, DEVYANI,
- MPHASIS, LTIM, ASHOKLEY, DATAPATTNS, ITC, AUBANK, COFORGE, TECHM,
+ MPHASIS, LTIM, ASHOKLEY, DATAPATTNS, ITC, AUBANK, COFORGE, TECHM, INFY,
  NIFTY) = (reader.get_ticker_data(ticker) for ticker in [
      'PIDILITIND.NS', 'JUBLINGREA.NS', 'AMBER.NS', 'METROPOLIS.NS',
      'SUPRAJIT.NS', 'SONACOMS.NS', 'FEDERALBNK.NS', 'HDFCBANK.NS', 'NEWGEN.NS',
      'NATCOPHARM.NS', 'LTTS.NS', 'TATASTEEL.NS', 'MARICO.NS', 'HCLTECH.NS',
      'DEVYANI.NS', 'MPHASIS.NS', 'LTIM.NS', 'ASHOKLEY.NS', 'DATAPATTNS.NS',
-     'ITC.NS', 'AUBANK.NS', 'COFORGE.NS', 'TECHM.NS', '^NSEI'
+     'ITC.NS', 'AUBANK.NS', 'COFORGE.NS', 'TECHM.NS', 'INFY.NS', '^NSEI'
  ])
 
 mystocks_nifty = group_stocks({
@@ -42,16 +42,21 @@ def get_data_from_sql(query):
 
 
 def etl_Data():
-    toload = (mystocks_nifty
-            .reset_index()[['date', 'name', 'open', 'high', 'low', 'close', 'adj_close', 'volume']]
-            .assign(isIndex = lambda _df: _df['name']=='NIFTY')
-                )
-    
-    dataloader.full_load(df=toload, tbl="stocks", hasindex=False, custom = {"id": "INT PRIMARY KEY",
-                                                                                  "date": "DATE"
-          })
-    dataloader.full_load(df=scrips.sort_values(by='Scrip'), tbl="scrips", hasindex=False, custom = {"id": "INT PRIMARY KEY"
-          })
-    
+    toload = (mystocks_nifty.reset_index()[[
+        'date', 'name', 'open', 'high', 'low', 'close', 'adj_close', 'volume'
+    ]].assign(isIndex=lambda _df: _df['name'] == 'NIFTY'))
+
+    dataloader.full_load(df=toload,
+                         tbl="stocks",
+                         hasindex=False,
+                         custom={
+                             "id": "INT PRIMARY KEY",
+                             "date": "DATE"
+                         })
+    dataloader.full_load(df=scrips.sort_values(by='Scrip'),
+                         tbl="scrips",
+                         hasindex=False,
+                         custom={"id": "INT PRIMARY KEY"})
+
     print("Done: Loaded all the tables")
     print()
